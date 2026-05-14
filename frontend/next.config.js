@@ -22,6 +22,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  transpilePackages: ["lucide-react"],
 };
 
 module.exports = nextConfig;

@@ -30,7 +30,7 @@ import {
   IndianRupee,
   Tag,
   Edit3,
-  X,
+  X as XIcon,
   ExternalLink,
 } from "lucide-react";
 
@@ -327,7 +327,7 @@ export default function SellerProductsPage() {
                       onClick={() => setSelectedPdfUrl(null)}
                       className="p-2 text-gray-400 hover:text-white hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-all"
                     >
-                      <X className="w-6 h-6" />
+                      <XIcon className="w-6 h-6" />
                     </button>
                   </div>
                 </div>
