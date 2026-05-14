@@ -1,7 +1,5 @@
 # 🛒 Seller & Product Management System
 
-![Banner](docs/assets/banner.png)
-
 A professional, full-stack **Management Information System (MIS)** designed for multi-role product ecosystems. This application allows administrators to manage sellers and brands while providing sellers with a robust platform to list, track, and report their inventory.
 
 ---
