@@ -42,9 +42,32 @@ const { validateSellerLogin, validateAddProduct } = require("../validations/sell
 // ============================================
 
 /**
- * @route   POST /api/seller/login
- * @desc    Seller login - returns JWT token
- * @access  Public
+ * @swagger
+ * /api/seller/login:
+ *   post:
+ *     summary: Seller login
+ *     tags: [Seller]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
  */
 router.post("/login", validateSellerLogin, sellerLogin);
 
@@ -53,23 +76,41 @@ router.post("/login", validateSellerLogin, sellerLogin);
 // ============================================
 
 /**
- * @route   POST /api/seller/products
- * @desc    Add a new product with multiple brands and images
- * @access  Private (Seller only)
- *
- * Multer Middleware:
- * upload.array('brandImages', 10)
- * - 'brandImages': HTML form field name for files
- * - 10: maximum number of files allowed
- * - Processes files before reaching controller
- * - Saves files to uploads/ folder
- * - Makes files available as req.files array
- *
- * Frontend must send:
- * - productName (text field)
- * - productDescription (text field)
- * - brands (JSON string field)
- * - brandImages (file fields, one per brand)
+ * @swagger
+ * /api/seller/products:
+ *   post:
+ *     summary: Add a new product with multiple brands and images
+ *     tags: [Seller]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productName
+ *               - productDescription
+ *               - brands
+ *             properties:
+ *               productName:
+ *                 type: string
+ *               productDescription:
+ *                 type: string
+ *               brands:
+ *                 type: string
+ *                 description: JSON string of brands array
+ *               brandImages:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Product added successfully
+ *       400:
+ *         description: Bad request
  */
 router.post(
   "/products",
@@ -81,9 +122,33 @@ router.post(
 );
 
 /**
- * @route   GET /api/seller/products?page=1&limit=10&search=query
- * @desc    Get logged-in seller's products with pagination
- * @access  Private (Seller only)
+ * @swagger
+ * /api/seller/products:
+ *   get:
+ *     summary: Get logged-in seller's products with pagination
+ *     tags: [Seller]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of products
+ *       401:
+ *         description: Unauthorized
  */
 router.get(
   "/products",
@@ -93,12 +158,24 @@ router.get(
 );
 
 /**
- * @route   GET /api/seller/products/:id/pdf
- * @desc    Generate and stream PDF for a specific product
- * @access  Private (Seller only - their own products)
- *
- * Note: :id is a dynamic URL parameter (MongoDB ObjectId)
- * Accessible via req.params.id in controller
+ * @swagger
+ * /api/seller/products/{id}/pdf:
+ *   get:
+ *     summary: Generate and stream PDF for a specific product
+ *     tags: [Seller]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: PDF file
+ *       404:
+ *         description: Product not found
  */
 router.get(
   "/products/:id/pdf",
@@ -108,9 +185,24 @@ router.get(
 );
 
 /**
- * @route   DELETE /api/seller/products/:id
- * @desc    Delete a product (only owner can delete)
- * @access  Private (Seller only - their own products)
+ * @swagger
+ * /api/seller/products/{id}:
+ *   delete:
+ *     summary: Delete a product
+ *     tags: [Seller]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product deleted successfully
+ *       404:
+ *         description: Product not found
  */
 router.delete(
   "/products/:id",
@@ -120,9 +212,42 @@ router.delete(
 );
 
 /**
- * @route   PUT /api/seller/products/:id
- * @desc    Update an existing product
- * @access  Private (Seller only)
+ * @swagger
+ * /api/seller/products/{id}:
+ *   put:
+ *     summary: Update an existing product
+ *     tags: [Seller]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productName:
+ *                 type: string
+ *               productDescription:
+ *                 type: string
+ *               brands:
+ *                 type: string
+ *               brandImages:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Product updated successfully
+ *       404:
+ *         description: Product not found
  */
 router.put(
   "/products/:id",
@@ -134,9 +259,24 @@ router.put(
 );
 
 /**
- * @route   GET /api/seller/products/:id
- * @desc    Get a single product details
- * @access  Private (Seller only)
+ * @swagger
+ * /api/seller/products/{id}:
+ *   get:
+ *     summary: Get a single product details
+ *     tags: [Seller]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product details
+ *       404:
+ *         description: Product not found
  */
 router.get(
   "/products/:id",
